@@ -27,8 +27,9 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         }
         if (event.geofenceTransition != Geofence.GEOFENCE_TRANSITION_ENTER) return
 
-        val listIds = event.triggeringGeofences
-            ?.map { it.requestId }
+        // WorkManager's Data expects Array<String?>, so keep the element type nullable.
+        val listIds: Array<String?> = event.triggeringGeofences
+            ?.map { it.requestId as String? }
             ?.toTypedArray()
             ?: return
         if (listIds.isEmpty()) return
