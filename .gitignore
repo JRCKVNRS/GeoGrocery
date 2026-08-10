@@ -8,3 +8,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# transient CI download folders
+_apk/
+_ks/
