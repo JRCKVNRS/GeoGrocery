@@ -1,33 +1,39 @@
 package com.conspect.geogrocery.ui.screens.create
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +53,7 @@ fun CreateListScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { Text(stringRes(R.string.title_new_list)) },
@@ -54,36 +61,52 @@ fun CreateListScreen(
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                )
             )
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            SectionLabel(stringRes(R.string.label_list_name))
             OutlinedTextField(
                 value = state.title,
                 onValueChange = viewModel::onTitleChange,
-                label = { Text(stringRes(R.string.label_list_title)) },
+                placeholder = { Text(stringRes(R.string.hint_list_name)) },
                 singleLine = true,
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             )
 
+            SectionLabel(
+                text = stringRes(R.string.label_link_location),
+                modifier = Modifier.padding(top = 8.dp)
+            )
             OutlinedTextField(
                 value = state.query,
                 onValueChange = viewModel::onQueryChange,
-                label = { Text(stringRes(R.string.label_search_location)) },
-                leadingIcon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
+                placeholder = { Text(stringRes(R.string.hint_search_location)) },
                 trailingIcon = {
                     if (state.isSearching) {
-                        CircularProgressIndicator(modifier = Modifier.padding(12.dp))
+                        CircularProgressIndicator(
+                            modifier = Modifier.padding(12.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(Icons.Default.Search, contentDescription = null)
                     }
                 },
                 singleLine = true,
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -96,7 +119,11 @@ fun CreateListScreen(
             }
 
             if (state.searchResults.isNotEmpty()) {
-                Card(modifier = Modifier.fillMaxWidth()) {
+                OutlinedCard(
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Column {
                         state.searchResults.forEachIndexed { index, result ->
                             SearchResultRow(
@@ -111,12 +138,10 @@ fun CreateListScreen(
 
             state.selectedLocation?.let { selected ->
                 SelectedLocationCard(selected)
-            }
 
-            Column {
-                Text(
+                SectionLabel(
                     text = stringRes(R.string.label_radius, state.radiusMeters.roundToInt()),
-                    style = MaterialTheme.typography.bodyMedium
+                    modifier = Modifier.padding(top = 8.dp)
                 )
                 Slider(
                     value = state.radiusMeters,
@@ -129,12 +154,29 @@ fun CreateListScreen(
             Button(
                 onClick = { viewModel.save(onDone) },
                 enabled = state.canSave,
-                modifier = Modifier.fillMaxWidth()
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+                    .padding(top = 8.dp)
             ) {
-                Text(stringRes(R.string.action_save_list))
+                Text(
+                    stringRes(R.string.action_save_list),
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
     }
+}
+
+@Composable
+private fun SectionLabel(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -143,7 +185,7 @@ private fun SearchResultRow(result: LocationSearchResult, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(16.dp),
+            .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -156,15 +198,15 @@ private fun SearchResultRow(result: LocationSearchResult, onClick: () -> Unit) {
             Text(
                 text = result.primaryName,
                 style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = result.displayName,
+                text = stringRes(R.string.source_osm),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -172,7 +214,11 @@ private fun SearchResultRow(result: LocationSearchResult, onClick: () -> Unit) {
 
 @Composable
 private fun SelectedLocationCard(result: LocationSearchResult) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    OutlinedCard(
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -184,11 +230,17 @@ private fun SelectedLocationCard(result: LocationSearchResult) {
                 tint = MaterialTheme.colorScheme.primary
             )
             Column {
-                Text(result.primaryName, style = MaterialTheme.typography.titleSmall)
+                Text(
+                    result.primaryName,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
                 Text(
                     text = result.displayName,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

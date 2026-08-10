@@ -3,6 +3,7 @@ package com.conspect.geogrocery.ui.navigation
 import com.conspect.geogrocery.geofence.GeofenceConstants
 
 object Routes {
+    const val HOME = "home"
     const val LISTS = "lists"
     const val CREATE_LIST = "create_list"
     const val LIST_DETAIL = "list_detail"

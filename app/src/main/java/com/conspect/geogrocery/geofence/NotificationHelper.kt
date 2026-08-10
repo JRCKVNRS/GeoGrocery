@@ -78,8 +78,10 @@ class NotificationHelper @Inject constructor(
             GeofenceConstants.NOTIFICATION_CHANNEL_ID
         )
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(context.getString(R.string.notif_title, list.location.locationName))
-            .setContentText(open.firstOrNull()?.text ?: list.title)
+            .setContentTitle(
+                context.getString(R.string.notif_title, list.location.locationName.uppercase())
+            )
+            .setContentText(context.getString(R.string.notif_summary, open.size))
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

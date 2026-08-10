@@ -9,16 +9,16 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.conspect.geogrocery.ui.screens.create.CreateListScreen
 import com.conspect.geogrocery.ui.screens.detail.ListDetailScreen
-import com.conspect.geogrocery.ui.screens.lists.ListsScreen
+import com.conspect.geogrocery.ui.screens.home.HomeScreen
 
 @Composable
 fun GeoGroceryNavHost() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Routes.LISTS) {
+    NavHost(navController = navController, startDestination = Routes.HOME) {
 
-        composable(Routes.LISTS) {
-            ListsScreen(
+        composable(Routes.HOME) {
+            HomeScreen(
                 onCreateList = { navController.navigate(Routes.CREATE_LIST) },
                 onOpenList = { listId -> navController.navigate(Routes.detail(listId)) }
             )
