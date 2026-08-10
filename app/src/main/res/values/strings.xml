@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GeoGrocery</string>
+
+    <!-- Lists overview -->
+    <string name="action_new_list">Nieuwe lijst</string>
+    <string name="empty_lists">Nog geen lijstjes. Tik op + om te beginnen.</string>
+    <string name="list_progress">%1$d van %2$d afgevinkt</string>
+
+    <!-- Create list -->
+    <string name="title_new_list">Nieuwe boodschappenlijst</string>
+    <string name="label_list_title">Titel</string>
+    <string name="label_search_location">Zoek winkel of locatie</string>
+    <string name="error_search">Zoeken mislukt. Controleer je verbinding en probeer opnieuw.</string>
+    <string name="label_radius">Straal: %1$d meter</string>
+    <string name="action_save_list">Lijst opslaan</string>
+
+    <!-- Detail -->
+    <string name="title_list">Lijst</string>
+    <string name="action_delete_list">Lijst verwijderen</string>
+    <string name="radius_summary">Herinnering binnen %1$d m</string>
+    <string name="reminder_toggle">Herinnering aan</string>
+    <string name="status_completed">Afgehandeld</string>
+    <string name="action_mark_completed">Markeer als afgehandeld</string>
+    <string name="action_delete_item">Item verwijderen</string>
+    <string name="action_add_item">Item toevoegen</string>
+    <string name="hint_add_item">Voeg een artikel toe…</string>
+
+    <!-- Geofence notification -->
+    <string name="geofence_channel_name">Locatieherinneringen</string>
+    <string name="geofence_channel_desc">Meldingen wanneer je aankomt bij een gekoppelde winkel.</string>
+    <string name="notif_title">Je bent bij %1$s</string>
+    <string name="notif_no_open_items">Alle artikelen zijn al afgevinkt.</string>
+    <string name="notif_more_items">en nog %1$d meer…</string>
+</resources>
