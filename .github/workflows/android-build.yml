@@ -30,7 +30,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace
+        run: ./gradlew :app:assembleDebug -PversionCode=$((100 + ${{ github.run_number }})) -PversionName=1.0.${{ github.run_number }} --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

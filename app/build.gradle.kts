@@ -14,8 +14,10 @@ android {
         applicationId = "com.conspect.geogrocery"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        // CI passes -PversionCode / -PversionName (the GitHub run number) so every build has a
+        // higher versionCode than the last — required for Play uploads. Falls back for local builds.
+        versionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull() ?: 1
+        versionName = (project.findProperty("versionName") as String?) ?: "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }

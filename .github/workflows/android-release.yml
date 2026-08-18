@@ -29,7 +29,8 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build release AAB
-        run: ./gradlew :app:bundleRelease --stacktrace
+        # Offset keeps versionCode comfortably above any earlier hand-set value (1).
+        run: ./gradlew :app:bundleRelease -PversionCode=$((100 + ${{ github.run_number }})) -PversionName=1.0.${{ github.run_number }} --stacktrace
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
