@@ -30,11 +30,19 @@ android {
             keyAlias = "androiddebugkey"
             keyPassword = "android"
         }
+        // Upload key for Google Play (App Signing re-signs with the app key Google manages).
+        create("release") {
+            storeFile = file("upload.keystore")
+            storePassword = "geogrocery"
+            keyAlias = "upload"
+            keyPassword = "geogrocery"
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
