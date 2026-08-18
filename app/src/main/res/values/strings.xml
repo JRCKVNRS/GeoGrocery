@@ -26,6 +26,9 @@
     <string name="label_radius">Straal: %1$d meter</string>
     <string name="action_save_list">Lijst opslaan</string>
 
+    <!-- Quick / voice create -->
+    <string name="quick_create_loading">Boodschappenlijst maken voor %1$s…</string>
+
     <!-- Detail -->
     <string name="title_list">Lijst</string>
     <string name="action_delete_list">Lijst verwijderen</string>

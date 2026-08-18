@@ -50,6 +50,20 @@
                     android:scheme="geogrocery"
                     android:host="list" />
             </intent-filter>
+            <!-- Voice / quick-create deep link: geogrocery://create?store={name} -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="geogrocery"
+                    android:host="create" />
+            </intent-filter>
+
+            <!-- Google Assistant App Actions capability definitions -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
 
         <!-- Receives GEOFENCE_TRANSITION_ENTER callbacks from Location Services -->

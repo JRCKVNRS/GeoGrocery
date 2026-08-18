@@ -1,5 +1,6 @@
 package com.conspect.geogrocery.ui
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -24,6 +25,7 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT)
         )
         super.onCreate(savedInstanceState)
+        val initialStore = extractVoiceStore(intent)
         setContent {
             GeoGroceryTheme {
                 Surface(
@@ -33,10 +35,22 @@ class MainActivity : ComponentActivity() {
                     // Requests the location/notification permissions geofencing needs, then
                     // hosts the app once at least foreground permission is available.
                     PermissionGate {
-                        GeoGroceryNavHost()
+                        GeoGroceryNavHost(initialStore = initialStore)
                     }
                 }
             }
         }
+    }
+
+    /**
+     * The store name from a "Hey Google, maak een boodschappenlijst voor …" App Action (delivered
+     * as the "store" extra) or the geogrocery://create?store=… deep link.
+     */
+    private fun extractVoiceStore(intent: Intent?): String? {
+        val fromExtra = intent?.getStringExtra("store")
+        val fromUri = intent?.data
+            ?.takeIf { it.scheme == "geogrocery" && it.host == "create" }
+            ?.getQueryParameter("store")
+        return (fromExtra ?: fromUri)?.trim()?.takeIf { it.isNotBlank() }
     }
 }

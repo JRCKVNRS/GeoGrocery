@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      Google Assistant App Action. Lets a user say e.g.
+        "Hey Google, maak een boodschappenlijst voor Dekamarkt Zeewolde"
+      The spoken list name (itemList.name) is delivered to MainActivity as the "store" extra;
+      the app geocodes it and creates a reminder list with the smallest radius.
+
+      NOTE: For Assistant to route the phrase to this app in production it must be published on
+      Google Play (or tested via Android Studio's App Actions Test Tool). The declaration below is
+      the required foundation; the same flow also works now via the geogrocery://create?store= link.
+    -->
+    <capability android:name="actions.intent.CREATE_ITEM_LIST">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.conspect.geogrocery"
+            android:targetClass="com.conspect.geogrocery.ui.MainActivity">
+            <parameter
+                android:name="itemList.name"
+                android:key="store" />
+        </intent>
+    </capability>
+
+</shortcuts>
