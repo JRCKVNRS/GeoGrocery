@@ -36,8 +36,6 @@ fun LocationMap(
     val mapView = remember { MapView(context) }
     val circle = remember { Polygon() }
     val marker = remember { Marker(mapView) }
-    // Tracks the last location we fitted the zoom to, so radius-only changes don't re-zoom.
-    val lastCenter = remember { doubleArrayOf(Double.NaN, Double.NaN) }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -74,13 +72,10 @@ fun LocationMap(
             marker.position = center
             circle.points = Polygon.pointsAsCircle(center, radiusMeters.toDouble())
 
-            val moved = lastCenter[0] != latitude || lastCenter[1] != longitude
-            if (moved) {
-                lastCenter[0] = latitude
-                lastCenter[1] = longitude
-                map.post {
-                    map.zoomToBoundingBox(boundingBox(latitude, longitude, radiusMeters), false, 48)
-                }
+            // Re-fit on every change so the whole circle stays framed; as the radius grows the
+            // circle covers more of the map (streets shrink), which reads as "the area grows".
+            map.post {
+                map.zoomToBoundingBox(boundingBox(latitude, longitude, radiusMeters), false, 48)
             }
             map.invalidate()
         }
