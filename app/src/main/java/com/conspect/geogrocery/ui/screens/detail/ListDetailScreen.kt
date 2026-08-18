@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,12 +40,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -66,6 +70,20 @@ fun ListDetailScreen(
 ) {
     val list by viewModel.list.collectAsStateWithLifecycle()
     val current = list
+
+    // Declared unconditionally (before the early return) so hook order stays stable.
+    val listState = rememberLazyListState()
+    var isAdding by remember { mutableStateOf(false) }
+    var prevItemCount by remember { mutableIntStateOf(-1) }
+    val itemCount = current?.items?.size ?: 0
+
+    // Scroll the newly added item into view (only when the count actually grows).
+    LaunchedEffect(itemCount) {
+        if (prevItemCount in 0 until itemCount) {
+            listState.animateScrollToItem(itemCount - 1)
+        }
+        prevItemCount = itemCount
+    }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -105,6 +123,7 @@ fun ListDetailScreen(
             )
 
             LazyColumn(
+                state = listState,
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
@@ -118,13 +137,19 @@ fun ListDetailScreen(
                 }
             }
 
-            AddItemBar(onAdd = viewModel::addItem)
-
-            CompletionButton(
-                isCompleted = current.isCompleted,
-                onClick = { viewModel.setCompleted(!current.isCompleted) },
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            AddItemBar(
+                onAdd = viewModel::addItem,
+                onFocusChanged = { focused -> isAdding = focused }
             )
+
+            // Hide the "mark completed" button while building the list (add field focused).
+            if (!isAdding) {
+                CompletionButton(
+                    isCompleted = current.isCompleted,
+                    onClick = { viewModel.setCompleted(!current.isCompleted) },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                )
+            }
         }
     }
 }
@@ -217,7 +242,10 @@ private fun ItemRow(
 }
 
 @Composable
-private fun AddItemBar(onAdd: (String) -> Unit) {
+private fun AddItemBar(
+    onAdd: (String) -> Unit,
+    onFocusChanged: (Boolean) -> Unit
+) {
     var text by remember { mutableStateOf("") }
     Row(
         modifier = Modifier
@@ -231,6 +259,9 @@ private fun AddItemBar(onAdd: (String) -> Unit) {
             placeholder = { Text(stringRes(R.string.hint_add_item)) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .weight(1f)
+                .onFocusChanged { onFocusChanged(it.isFocused) },
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
                 imeAction = ImeAction.Done
@@ -243,8 +274,7 @@ private fun AddItemBar(onAdd: (String) -> Unit) {
                         text = ""
                     }
                 }
-            ),
-            modifier = Modifier.weight(1f)
+            )
         )
         IconButton(
             onClick = {
