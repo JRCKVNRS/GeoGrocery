@@ -1,7 +1,10 @@
 package com.conspect.geogrocery.ui.screens.detail
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -41,6 +44,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +53,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -76,6 +83,18 @@ fun ListDetailScreen(
     var isAdding by remember { mutableStateOf(false) }
     var prevItemCount by remember { mutableIntStateOf(-1) }
     val itemCount = current?.items?.size ?: 0
+
+    // When the list is scrolled, dim the location header and fade items out beneath it,
+    // signalling that there is more to scroll.
+    val canScrollUp by remember { derivedStateOf { listState.canScrollBackward } }
+    val headerAlpha by animateFloatAsState(
+        targetValue = if (canScrollUp) 0.45f else 1f,
+        label = "headerAlpha"
+    )
+    val fadeAlpha by animateFloatAsState(
+        targetValue = if (canScrollUp) 1f else 0f,
+        label = "fadeAlpha"
+    )
 
     // Scroll the newly added item into view (only when the count actually grows).
     LaunchedEffect(itemCount) {
@@ -114,27 +133,46 @@ fun ListDetailScreen(
     ) { padding ->
         if (current == null) return@Scaffold
 
+        val backgroundColor = MaterialTheme.colorScheme.background
+
         // imePadding on the whole column: when the keyboard opens the list area shrinks and the
         // location/reminder header stays visible, instead of the window panning up.
         Column(modifier = Modifier.fillMaxSize().padding(padding).imePadding()) {
-            HeaderCard(
-                list = current,
-                onReminderToggle = viewModel::setReminderEnabled
-            )
+            Box(modifier = Modifier.graphicsLayer { alpha = headerAlpha }) {
+                HeaderCard(
+                    list = current,
+                    onReminderToggle = viewModel::setReminderEnabled
+                )
+            }
 
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                items(current.items, key = { it.itemId }) { item ->
-                    ItemRow(
-                        item = item,
-                        onToggle = { viewModel.setItemDone(item, it) },
-                        onDelete = { viewModel.deleteItem(item) }
-                    )
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    items(current.items, key = { it.itemId }) { item ->
+                        ItemRow(
+                            item = item,
+                            onToggle = { viewModel.setItemDone(item, it) },
+                            onDelete = { viewModel.deleteItem(item) }
+                        )
+                    }
                 }
+                // Gradient scrim so items fade into the background as they scroll under the header.
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth()
+                        .height(36.dp)
+                        .graphicsLayer { alpha = fadeAlpha }
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(backgroundColor, Color.Transparent)
+                            )
+                        )
+                )
             }
 
             AddItemBar(
