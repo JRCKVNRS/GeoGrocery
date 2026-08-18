@@ -103,4 +103,7 @@ dependencies {
 
     // Permissions
     implementation(libs.accompanist.permissions)
+
+    // Free OpenStreetMap map view (no API key)
+    implementation(libs.osmdroid.android)
 }

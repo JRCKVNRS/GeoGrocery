@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -44,6 +46,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -92,7 +96,9 @@ fun ListDetailScreen(
     ) { padding ->
         if (current == null) return@Scaffold
 
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
+        // imePadding on the whole column: when the keyboard opens the list area shrinks and the
+        // location/reminder header stays visible, instead of the window panning up.
+        Column(modifier = Modifier.fillMaxSize().padding(padding).imePadding()) {
             HeaderCard(
                 list = current,
                 onReminderToggle = viewModel::setReminderEnabled
@@ -216,7 +222,6 @@ private fun AddItemBar(onAdd: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .imePadding()
             .padding(horizontal = 16.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -226,6 +231,19 @@ private fun AddItemBar(onAdd: (String) -> Unit) {
             placeholder = { Text(stringRes(R.string.hint_add_item)) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = ImeAction.Done
+            ),
+            // Enter/Done adds the item and keeps focus so you can keep adding rapidly.
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    if (text.isNotBlank()) {
+                        onAdd(text)
+                        text = ""
+                    }
+                }
+            ),
             modifier = Modifier.weight(1f)
         )
         IconButton(

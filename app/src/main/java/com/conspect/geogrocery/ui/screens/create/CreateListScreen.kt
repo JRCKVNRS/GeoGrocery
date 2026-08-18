@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.conspect.geogrocery.R
 import com.conspect.geogrocery.domain.model.LocationSearchResult
+import com.conspect.geogrocery.ui.components.LocationMap
 import com.conspect.geogrocery.ui.util.stringRes
 import kotlin.math.roundToInt
 
@@ -149,6 +151,17 @@ fun CreateListScreen(
                     valueRange = 50f..1000f,
                     steps = 18
                 )
+
+                LocationMap(
+                    latitude = selected.latitude,
+                    longitude = selected.longitude,
+                    radiusMeters = state.radiusMeters,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                        .padding(top = 4.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                )
             }
 
             Button(
@@ -204,9 +217,11 @@ private fun SearchResultRow(result: LocationSearchResult, onClick: () -> Unit) {
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = stringRes(R.string.source_osm),
+                text = result.displayName,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
