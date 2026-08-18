@@ -41,11 +41,15 @@
 
     <!-- Settings -->
     <string name="settings_bg_location_title">Achtergrondlocatie</string>
-    <string name="settings_bg_location_desc">Kies \'Altijd toestaan\' zodat herinneringen ook werken als de app gesloten is.</string>
+    <string name="settings_bg_location_hint_off">Tik en kies \'Altijd toestaan\' zodat herinneringen ook werken als de app gesloten is.</string>
     <string name="settings_notifications_title">Meldingen</string>
-    <string name="settings_notifications_desc">Sta meldingen toe om je boodschappenlijst te ontvangen bij aankomst.</string>
+    <string name="settings_notifications_hint_off">Tik om meldingen aan te zetten en je boodschappenlijst te ontvangen bij aankomst.</string>
     <string name="settings_about_title">Over GeoGrocery</string>
     <string name="settings_about_desc">Versie %1$s · Locatiedata © OpenStreetMap</string>
+    <string name="settings_status_on">Aan</string>
+    <string name="settings_status_off">Uit</string>
+    <string name="settings_status_always">Altijd</string>
+    <string name="settings_tap_manage">Tik om te beheren in Instellingen.</string>
 
     <!-- Geofence notification -->
     <string name="geofence_channel_name">Locatieherinneringen</string>
